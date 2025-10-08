@@ -67,6 +67,11 @@
             background: #ff9500;
         }
         
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
         .loading {
             text-align: center;
             padding: 40px;
@@ -126,11 +131,10 @@
             text-align: center;
         }
         
-        .card img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            margin-bottom: 8px;
+        .card-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #ffbb00;
         }
         
         .battles-section {
@@ -166,8 +170,23 @@
             margin: 20px 0;
         }
         
+        .success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #6bff8d;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
         .hidden {
             display: none;
+        }
+        
+        .api-status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #ccc;
         }
     </style>
 </head>
@@ -178,9 +197,10 @@
             <p>Enter your player tag to view stats and analytics</p>
             
             <div class="search-box">
-                <input type="text" id="playerTag" placeholder="Enter Player Tag (e.g. #ABC123)" value="#P0LY0U8G">
+                <input type="text" id="playerTag" placeholder="Enter Player Tag (e.g. #U8028CG2V)" value="#U8028CG2V">
                 <button id="searchBtn">Search Player</button>
             </div>
+            <div class="api-status" id="apiStatus">Using demo data - API access required for real data</div>
         </header>
 
         <div id="loading" class="loading hidden">
@@ -188,12 +208,14 @@
         </div>
 
         <div id="error" class="error hidden"></div>
+        <div id="success" class="success hidden"></div>
 
         <div id="playerData" class="hidden">
             <div class="player-info">
                 <h2 id="playerName">Player Name</h2>
-                <p id="playerTagDisplay">Tag: #P0LY0U8G</p>
+                <p id="playerTagDisplay">Tag: #U8028CG2V</p>
                 <p id="playerClan">Clan: Loading...</p>
+                <p id="dataSource" style="color: #ff7b00; font-size: 14px; margin-top: 10px;"></p>
             </div>
 
             <div class="stats-grid">
@@ -242,44 +264,89 @@
     <script>
         // API Configuration
         const API_BASE_URL = 'https://api.clashroyale.com/v1';
-        const API_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImY3Y2QxYzM5LTQ5Y2MtNDQzZC1hYjQxLTA2YzQ1Y2QwM2QwZCIsImlhdCI6MTczMjc3NDUwNiwic3ViIjoiZGV2ZWxvcGVyL2Y3Y2QxYzM5LTQ5Y2MtNDQzZC1hYjQxLTA2YzQ1Y2QwM2QwZCIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyIxODQuMTUwLjE2OC4xNjgiXSwidHlwZSI6ImNsaWVudCJ9XX0.7hXG2C3X0t3n9hN9h2x8_6Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q';
+        
+        // Your API token (replace with actual token from https://developer.clashroyale.com)
+        const API_TOKEN = 'rncyr978';
+        
+        // Sample data for demonstration
+        const SAMPLE_PLAYER_DATA = {
+            name: "ClashMaster",
+            tag: "#U8028CG2V",
+            trophies: 5432,
+            level: 13,
+            wins: 1247,
+            losses: 892,
+            bestTrophies: 5678,
+            clan: "Royale Warriors",
+            deck: [
+                { name: "Knight", level: 12, elixir: 3 },
+                { name: "Archers", level: 13, elixir: 3 },
+                { name: "Fireball", level: 11, elixir: 4 },
+                { name: "Mega Minion", level: 12, elixir: 3 },
+                { name: "Battle Ram", level: 12, elixir: 4 },
+                { name: "Poison", level: 10, elixir: 4 },
+                { name: "Electro Wizard", level: 11, elixir: 4 },
+                { name: "P.E.K.K.A", level: 9, elixir: 7 }
+            ],
+            battles: [
+                { result: "win", mode: "Ladder", teamCrowns: 3, opponentCrowns: 1, timestamp: "2 hours ago" },
+                { result: "loss", mode: "2v2", teamCrowns: 0, opponentCrowns: 2, timestamp: "5 hours ago" },
+                { result: "win", mode: "Challenge", teamCrowns: 2, opponentCrowns: 0, timestamp: "1 day ago" },
+                { result: "win", mode: "Ladder", teamCrowns: 1, opponentCrowns: 0, timestamp: "1 day ago" },
+                { result: "loss", mode: "Ladder", teamCrowns: 1, opponentCrowns: 3, timestamp: "2 days ago" }
+            ]
+        };
 
         // DOM Elements
         const playerTagInput = document.getElementById('playerTag');
         const searchBtn = document.getElementById('searchBtn');
         const loadingDiv = document.getElementById('loading');
         const errorDiv = document.getElementById('error');
+        const successDiv = document.getElementById('success');
         const playerDataDiv = document.getElementById('playerData');
+        const apiStatusDiv = document.getElementById('apiStatus');
+        const dataSourceDiv = document.getElementById('dataSource');
 
         // Show/hide functions
         function showLoading() {
             loadingDiv.classList.remove('hidden');
             playerDataDiv.classList.add('hidden');
             errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+            searchBtn.disabled = true;
         }
 
         function hideLoading() {
             loadingDiv.classList.add('hidden');
+            searchBtn.disabled = false;
         }
 
         function showError(message) {
             errorDiv.textContent = message;
             errorDiv.classList.remove('hidden');
             playerDataDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
         }
 
-        function showPlayerData() {
-            playerDataDiv.classList.remove('hidden');
+        function showSuccess(message) {
+            successDiv.textContent = message;
+            successDiv.classList.remove('hidden');
             errorDiv.classList.add('hidden');
         }
 
-        // API Functions
-        async function fetchPlayerData(playerTag) {
+        function showPlayerData(source = "demo") {
+            playerDataDiv.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+            dataSourceDiv.textContent = `Data source: ${source}`;
+        }
+
+        // Real API Functions
+        async function fetchRealPlayerData(playerTag) {
             try {
                 const cleanTag = playerTag.replace('#', '').toUpperCase();
                 const encodedTag = encodeURIComponent(cleanTag);
                 
-                console.log('Fetching data for tag:', cleanTag);
+                console.log('Fetching real API data for tag:', cleanTag);
                 
                 const response = await fetch(`${API_BASE_URL}/players/${encodedTag}`, {
                     method: 'GET',
@@ -290,24 +357,19 @@
                 });
 
                 if (!response.ok) {
-                    if (response.status === 404) {
-                        throw new Error('Player not found. Please check the player tag.');
-                    } else if (response.status === 403) {
-                        throw new Error('API access denied. Please check your API token.');
-                    } else {
-                        throw new Error(`API Error: ${response.status}`);
-                    }
+                    throw new Error(`API returned ${response.status}: ${response.statusText}`);
                 }
 
-                return await response.json();
+                const data = await response.json();
+                return data;
                 
             } catch (error) {
-                console.error('API Error:', error);
+                console.error('Real API Error:', error);
                 throw error;
             }
         }
 
-        async function fetchBattleLog(playerTag) {
+        async function fetchRealBattleLog(playerTag) {
             try {
                 const cleanTag = playerTag.replace('#', '').toUpperCase();
                 const encodedTag = encodeURIComponent(cleanTag);
@@ -328,13 +390,29 @@
                 
             } catch (error) {
                 console.error('Battle log error:', error);
-                // Return empty array if battle log fails
                 return [];
             }
         }
 
-        // Data Processing Functions
-        function processPlayerData(apiData, battleLog) {
+        // Demo Data Functions
+        function getDemoPlayerData(playerTag) {
+            // Create variation based on player tag for demo purposes
+            const demoData = {...SAMPLE_PLAYER_DATA};
+            demoData.tag = playerTag;
+            
+            // Add some random variation to make it look different
+            const hash = playerTag.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+            demoData.trophies = 5000 + (hash % 2000);
+            demoData.wins = 1000 + (hash % 500);
+            demoData.losses = 800 + (hash % 400);
+            demoData.bestTrophies = demoData.trophies + 200 + (hash % 100);
+            demoData.level = 11 + (hash % 4);
+            
+            return demoData;
+        }
+
+        // Data Processing
+        function processPlayerData(apiData, battleLog, source) {
             const wins = apiData.wins || 0;
             const losses = apiData.losses || 0;
             const totalGames = wins + losses;
@@ -342,44 +420,18 @@
 
             return {
                 name: apiData.name,
-                tag: `#${apiData.tag}`,
+                tag: apiData.tag,
                 trophies: apiData.trophies,
-                level: apiData.expLevel,
+                level: apiData.expLevel || apiData.level,
                 wins: wins,
                 losses: losses,
                 winRate: winRate,
                 bestTrophies: apiData.bestTrophies,
-                clan: apiData.clan ? apiData.clan.name : 'No Clan',
-                deck: apiData.currentDeck || [],
-                battles: processBattleLog(battleLog)
+                clan: apiData.clan ? (apiData.clan.name || apiData.clan) : 'No Clan',
+                deck: apiData.currentDeck || apiData.deck || [],
+                battles: battleLog || apiData.battles || [],
+                source: source
             };
-        }
-
-        function processBattleLog(battleLog) {
-            if (!Array.isArray(battleLog)) return [];
-            
-            return battleLog.slice(0, 5).map(battle => {
-                const teamCrowns = battle.team && battle.team[0] ? battle.team[0].crowns : 0;
-                const opponentCrowns = battle.opponent && battle.opponent[0] ? battle.opponent[0].crowns : 0;
-                const isWin = teamCrowns > opponentCrowns;
-                
-                return {
-                    result: isWin ? 'win' : 'loss',
-                    mode: battle.gameMode?.name || 'Unknown',
-                    teamCrowns: teamCrowns,
-                    opponentCrowns: opponentCrowns,
-                    timestamp: formatBattleTime(battle.battleTime)
-                };
-            });
-        }
-
-        function formatBattleTime(battleTime) {
-            try {
-                const date = new Date(battleTime);
-                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-            } catch {
-                return 'Unknown time';
-            }
         }
 
         // UI Update Functions
@@ -403,7 +455,13 @@
             // Battles
             updateBattlesUI(playerData.battles);
             
-            showPlayerData();
+            showPlayerData(playerData.source);
+            
+            if (playerData.source === "real") {
+                showSuccess("Successfully loaded real player data from Clash Royale API!");
+            } else {
+                showSuccess("Showing demo data. To see real data, please set up a valid API token.");
+            }
         }
 
         function updateDeckUI(deck) {
@@ -419,9 +477,10 @@
                 const cardEl = document.createElement('div');
                 cardEl.className = 'card';
                 cardEl.innerHTML = `
-                    <img src="${card.iconUrls?.medium || 'https://via.placeholder.com/80'}" alt="${card.name}" onerror="this.src='https://via.placeholder.com/80'">
+                    <div class="card-icon">⚔️</div>
                     <div class="card-name">${card.name}</div>
                     <div class="card-level">Level ${card.level}</div>
+                    <div class="card-elixir">${card.elixir} Elixir</div>
                 `;
                 deckContainer.appendChild(cardEl);
             });
@@ -464,20 +523,41 @@
                 return;
             }
 
+            // Validate player tag format
+            if (!playerTag.startsWith('#')) {
+                showError('Player tag must start with #');
+                return;
+            }
+
             showLoading();
 
             try {
-                const [playerData, battleLog] = await Promise.all([
-                    fetchPlayerData(playerTag),
-                    fetchBattleLog(playerTag)
-                ]);
+                let playerData, battleLog, source;
                 
-                const processedData = processPlayerData(playerData, battleLog);
+                // Try real API first
+                try {
+                    console.log('Attempting to fetch from real API...');
+                    playerData = await fetchRealPlayerData(playerTag);
+                    battleLog = await fetchRealBattleLog(playerTag);
+                    source = "real";
+                    apiStatusDiv.textContent = "Connected to Clash Royale API";
+                    apiStatusDiv.style.color = "#28a745";
+                } catch (apiError) {
+                    console.log('Real API failed, using demo data:', apiError.message);
+                    // Fall back to demo data
+                    playerData = getDemoPlayerData(playerTag);
+                    battleLog = [];
+                    source = "demo";
+                    apiStatusDiv.textContent = "Using demo data - API unavailable";
+                    apiStatusDiv.style.color = "#ff7b00";
+                }
+                
+                const processedData = processPlayerData(playerData, battleLog, source);
                 updatePlayerUI(processedData);
                 
             } catch (error) {
                 console.error('Search error:', error);
-                showError(error.message || 'Failed to fetch player data. Please try again.');
+                showError('Failed to load player data: ' + error.message);
             } finally {
                 hideLoading();
             }
@@ -492,9 +572,15 @@
             }
         });
 
-        // Initialize with sample data or instructions
+        // Initialize
         console.log('Clash Royale Tracker Ready!');
-        console.log('API Token:', API_TOKEN ? 'Loaded' : 'Missing');
+        console.log('Player tag to try: #U8028CG2V');
+        
+        // Auto-load demo data on startup
+        setTimeout(() => {
+            const demoData = getDemoPlayerData("#U8028CG2V");
+            updatePlayerUI(processPlayerData(demoData, demoData.battles, "demo"));
+        }, 500);
     </script>
 </body>
 </html>
