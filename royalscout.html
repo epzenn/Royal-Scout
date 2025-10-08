@@ -357,6 +357,16 @@
             border: 1px solid rgba(220, 53, 69, 0.5);
         }
 
+        .api-info {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffd351;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            margin: 1rem 0;
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+
         @media (max-width: 992px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -402,149 +412,13 @@
 
     <div class="container">
         <div id="errorContainer"></div>
+        <div id="apiInfo" class="api-info">
+            <i class="fas fa-info-circle"></i>
+            Using proxy to bypass CORS restrictions. This may be slower but should work.
+        </div>
         
         <div class="dashboard" id="dashboard">
-            <div class="player-card">
-                <div class="player-header">
-                    <div class="player-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="player-info">
-                        <h2 id="playerName">Player Name</h2>
-                        <p id="playerTagDisplay">Tag: #U8028CG2V</p>
-                    </div>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="trophies">0</div>
-                        <div class="stat-label">Trophies</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="level">0</div>
-                        <div class="stat-label">King Level</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="wins">0</div>
-                        <div class="stat-label">Total Wins</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="losses">0</div>
-                        <div class="stat-label">Total Losses</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="winRate">0%</div>
-                        <div class="stat-label">Win Rate</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="bestTrophies">0</div>
-                        <div class="stat-label">Best Trophies</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="deck-section">
-                <h2 class="section-title"><i class="fas fa-layer-group"></i> Current Deck</h2>
-                <div class="deck-cards" id="deckContainer">
-                    <div class="card">
-                        <div class="card-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="card-name">Card Name</div>
-                        <div class="card-level">Level 0</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="card-name">Card Name</div>
-                        <div class="card-level">Level 0</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="card-name">Card Name</div>
-                        <div class="card-level">Level 0</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="card-name">Card Name</div>
-                        <div class="card-level">Level 0</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="card-name">Card Name</div>
-                        <div class="card-level">Level 0</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="card-name">Card Name</div>
-                        <div class="card-level">Level 0</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="card-name">Card Name</div>
-                        <div class="card-level">Level 0</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="card-name">Card Name</div>
-                        <div class="card-level">Level 0</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="analytics-section">
-                <h2 class="section-title"><i class="fas fa-chart-line"></i> Analytics</h2>
-                <div class="charts-container">
-                    <div class="chart">
-                        <div class="chart-placeholder">
-                            <i class="fas fa-trophy"></i>
-                            <h3>Trophy Progress</h3>
-                            <p>Chart showing trophy progression over time</p>
-                        </div>
-                    </div>
-                    <div class="chart">
-                        <div class="chart-placeholder">
-                            <i class="fas fa-chart-pie"></i>
-                            <h3>Deck Win Rate</h3>
-                            <p>Win rate analysis for current deck</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="recent-battles">
-                    <h2 class="section-title"><i class="fas fa-history"></i> Recent Battles</h2>
-                    <div class="battle-list" id="battleList">
-                        <div class="battle-card">
-                            <div class="battle-result">
-                                <div class="result-badge">WIN</div>
-                                <div>Just now</div>
-                            </div>
-                            <div class="battle-info">
-                                <div class="battle-mode">
-                                    <i class="fas fa-gamepad"></i>
-                                    <span>Ladder</span>
-                                </div>
-                                <div class="battle-trophies">
-                                    <i class="fas fa-trophy"></i>
-                                    <span>+32</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Dashboard content will be loaded here -->
         </div>
     </div>
 
@@ -554,15 +428,106 @@
     </footer>
 
     <script>
-        // API Configuration
+        // API Configuration with CORS proxy
         const API_BASE_URL = 'https://api.clashroyale.com/v1';
-        const API_TOKEN = 'rncyr978'; // Your API token
+        const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/'; // Public CORS proxy
+        const API_TOKEN = 'rncyr978';
 
         // DOM Elements
         const playerTagInput = document.getElementById('playerTag');
         const searchBtn = document.getElementById('searchBtn');
         const errorContainer = document.getElementById('errorContainer');
+        const apiInfo = document.getElementById('apiInfo');
         const dashboard = document.getElementById('dashboard');
+
+        // Show initial dashboard state
+        function showInitialState() {
+            dashboard.innerHTML = `
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="player-info">
+                            <h2>Enter Player Tag</h2>
+                            <p>Search for a player to see their stats</p>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Trophies</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">King Level</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Total Wins</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Total Losses</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Best Trophies</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="deck-section">
+                    <h2 class="section-title"><i class="fas fa-layer-group"></i> Current Deck</h2>
+                    <div class="deck-cards">
+                        ${Array(8).fill(0).map(() => `
+                            <div class="card">
+                                <div class="card-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="card-name">Search Player</div>
+                                <div class="card-level">Level -</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="analytics-section">
+                    <h2 class="section-title"><i class="fas fa-chart-line"></i> Analytics</h2>
+                    <div class="charts-container">
+                        <div class="chart">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-trophy"></i>
+                                <h3>Trophy Progress</h3>
+                                <p>Chart showing trophy progression over time</p>
+                            </div>
+                        </div>
+                        <div class="chart">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-pie"></i>
+                                <h3>Deck Win Rate</h3>
+                                <p>Win rate analysis for current deck</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-battles">
+                        <h2 class="section-title"><i class="fas fa-history"></i> Recent Battles</h2>
+                        <div class="battle-list">
+                            <div class="battle-card">
+                                <div class="battle-result">
+                                    <div>Search for a player to see battle history</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
 
         // Show loading state
         function showLoading() {
@@ -589,7 +554,7 @@
             errorContainer.innerHTML = '';
         }
 
-        // Fetch player data from Clash Royale API
+        // Fetch player data using proxy to avoid CORS
         async function fetchPlayerData(playerTag) {
             try {
                 clearError();
@@ -601,7 +566,10 @@
                 
                 console.log('Fetching data for player tag:', cleanTag);
 
-                const response = await fetch(`${API_BASE_URL}/players/${encodedTag}`, {
+                // Try with CORS proxy first
+                const proxyUrl = `${CORS_PROXY}${API_BASE_URL}/players/${encodedTag}`;
+                
+                const response = await fetch(proxyUrl, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${API_TOKEN}`,
@@ -610,23 +578,40 @@
                 });
 
                 if (!response.ok) {
-                    if (response.status === 404) {
-                        throw new Error('Player not found. Please check the player tag.');
-                    } else if (response.status === 403) {
-                        throw new Error('Invalid API token. Please check your API configuration.');
-                    } else if (response.status === 429) {
-                        throw new Error('Rate limit exceeded. Please try again later.');
-                    } else {
-                        throw new Error(`API error: ${response.status} ${response.statusText}`);
-                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const playerData = await response.json();
                 return playerData;
 
             } catch (error) {
-                console.error('Error fetching player data:', error);
-                throw error;
+                console.error('Error with proxy fetch:', error);
+                
+                // If proxy fails, try direct API call (might still fail due to CORS)
+                try {
+                    console.log('Trying direct API call...');
+                    const cleanTag = playerTag.replace('#', '').toUpperCase();
+                    const encodedTag = encodeURIComponent(cleanTag);
+                    
+                    const directResponse = await fetch(`${API_BASE_URL}/players/${encodedTag}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${API_TOKEN}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!directResponse.ok) {
+                        throw new Error(`Direct API call failed: ${directResponse.status}`);
+                    }
+
+                    const playerData = await directResponse.json();
+                    return playerData;
+
+                } catch (directError) {
+                    console.error('Direct API call also failed:', directError);
+                    throw new Error('Cannot connect to Clash Royale API. This is usually a CORS issue. Try running this page from a local server.');
+                }
             }
         }
 
@@ -636,7 +621,10 @@
                 const cleanTag = playerTag.replace('#', '').toUpperCase();
                 const encodedTag = encodeURIComponent(cleanTag);
 
-                const response = await fetch(`${API_BASE_URL}/players/${encodedTag}/battlelog`, {
+                // Try proxy first
+                const proxyUrl = `${CORS_PROXY}${API_BASE_URL}/players/${encodedTag}/battlelog`;
+                
+                const response = await fetch(proxyUrl, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${API_TOKEN}`,
@@ -664,102 +652,130 @@
             const totalGames = wins + losses;
             const winRate = totalGames > 0 ? ((wins / totalGames) * 100).toFixed(1) : 0;
 
-            // Update basic info
-            document.getElementById('playerName').textContent = playerData.name;
-            document.getElementById('playerTagDisplay').textContent = `Tag: #${playerData.tag}`;
-            
-            // Update stats
-            document.getElementById('trophies').textContent = playerData.trophies;
-            document.getElementById('level').textContent = playerData.expLevel;
-            document.getElementById('wins').textContent = wins;
-            document.getElementById('losses').textContent = losses;
-            document.getElementById('winRate').textContent = `${winRate}%`;
-            document.getElementById('bestTrophies').textContent = playerData.bestTrophies;
-
-            // Update deck
-            updateDeckUI(playerData.currentDeck);
-
-            // Update battles
-            updateBattlesUI(battleLog);
-        }
-
-        // Update deck UI
-        function updateDeckUI(deck) {
-            const deckContainer = document.getElementById('deckContainer');
-            deckContainer.innerHTML = '';
-
-            if (!deck || deck.length === 0) {
-                deckContainer.innerHTML = '<div class="card"><div class="card-name">No deck data</div></div>';
-                return;
-            }
-
-            deck.forEach(card => {
-                const cardElement = document.createElement('div');
-                cardElement.className = 'card';
-                cardElement.innerHTML = `
-                    <div class="card-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <div class="card-name">${card.name}</div>
-                    <div class="card-level">Level ${card.level}</div>
-                `;
-                deckContainer.appendChild(cardElement);
-            });
-        }
-
-        // Update battles UI
-        function updateBattlesUI(battleLog) {
-            const battleList = document.getElementById('battleList');
-            battleList.innerHTML = '';
-
-            if (!battleLog || battleLog.length === 0) {
-                battleList.innerHTML = '<div class="battle-card"><div>No recent battles</div></div>';
-                return;
-            }
-
-            // Show last 5 battles
-            const recentBattles = battleLog.slice(0, 5);
-
-            recentBattles.forEach(battle => {
-                const teamCrowns = battle.team[0]?.crowns || 0;
-                const opponentCrowns = battle.opponent[0]?.crowns || 0;
-                const isWin = teamCrowns > opponentCrowns;
-                const gameMode = battle.gameMode?.name || 'Unknown';
-
-                const battleElement = document.createElement('div');
-                battleElement.className = 'battle-card';
-                battleElement.innerHTML = `
-                    <div class="battle-result ${isWin ? 'win' : 'loss'}">
-                        <div class="result-badge">${isWin ? 'WIN' : 'LOSS'}</div>
-                        <div>${formatBattleTime(battle.battleTime)}</div>
-                    </div>
-                    <div class="battle-info">
-                        <div class="battle-mode">
-                            <i class="fas fa-gamepad"></i>
-                            <span>${gameMode}</span>
+            dashboard.innerHTML = `
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-avatar">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <div class="battle-trophies">
-                            <i class="fas fa-crown"></i>
-                            <span>${teamCrowns}-${opponentCrowns}</span>
+                        <div class="player-info">
+                            <h2>${playerData.name}</h2>
+                            <p>Tag: #${playerData.tag}</p>
+                            ${playerData.clan ? `<p>Clan: ${playerData.clan.name}</p>` : ''}
                         </div>
                     </div>
-                `;
-                battleList.appendChild(battleElement);
-            });
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${playerData.trophies}</div>
+                            <div class="stat-label">Trophies</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${playerData.expLevel}</div>
+                            <div class="stat-label">King Level</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${wins}</div>
+                            <div class="stat-label">Total Wins</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${losses}</div>
+                            <div class="stat-label">Total Losses</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${winRate}%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${playerData.bestTrophies}</div>
+                            <div class="stat-label">Best Trophies</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="deck-section">
+                    <h2 class="section-title"><i class="fas fa-layer-group"></i> Current Deck</h2>
+                    <div class="deck-cards" id="deckContainer">
+                        ${playerData.currentDeck ? playerData.currentDeck.map(card => `
+                            <div class="card">
+                                <div class="card-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="card-name">${card.name}</div>
+                                <div class="card-level">Level ${card.level}</div>
+                            </div>
+                        `).join('') : 'No deck data available'}
+                    </div>
+                </div>
+
+                <div class="analytics-section">
+                    <h2 class="section-title"><i class="fas fa-chart-line"></i> Analytics</h2>
+                    <div class="charts-container">
+                        <div class="chart">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-trophy"></i>
+                                <h3>Trophy Progress</h3>
+                                <p>Chart showing trophy progression over time</p>
+                            </div>
+                        </div>
+                        <div class="chart">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-pie"></i>
+                                <h3>Deck Win Rate</h3>
+                                <p>Win rate analysis for current deck</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-battles">
+                        <h2 class="section-title"><i class="fas fa-history"></i> Recent Battles</h2>
+                        <div class="battle-list" id="battleList">
+                            ${battleLog && battleLog.length > 0 ? battleLog.slice(0, 5).map(battle => {
+                                const teamCrowns = battle.team[0]?.crowns || 0;
+                                const opponentCrowns = battle.opponent[0]?.crowns || 0;
+                                const isWin = teamCrowns > opponentCrowns;
+                                const gameMode = battle.gameMode?.name || 'Unknown';
+                                
+                                return `
+                                    <div class="battle-card">
+                                        <div class="battle-result ${isWin ? 'win' : 'loss'}">
+                                            <div class="result-badge">${isWin ? 'WIN' : 'LOSS'}</div>
+                                            <div>${formatBattleTime(battle.battleTime)}</div>
+                                        </div>
+                                        <div class="battle-info">
+                                            <div class="battle-mode">
+                                                <i class="fas fa-gamepad"></i>
+                                                <span>${gameMode}</span>
+                                            </div>
+                                            <div class="battle-trophies">
+                                                <i class="fas fa-crown"></i>
+                                                <span>${teamCrowns}-${opponentCrowns}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('') : '<div class="battle-card"><div>No recent battles found</div></div>'}
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         // Format battle time
         function formatBattleTime(battleTime) {
-            const date = new Date(battleTime);
-            const now = new Date();
-            const diffMs = now - date;
-            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-            
-            if (diffHours < 1) return 'Just now';
-            if (diffHours < 24) return `${diffHours}h ago`;
-            if (diffDays === 1) return '1 day ago';
-            return `${diffDays} days ago`;
+            try {
+                const date = new Date(battleTime);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                
+                if (diffHours < 1) return 'Just now';
+                if (diffHours < 24) return `${diffHours}h ago`;
+                if (diffDays === 1) return '1 day ago';
+                return `${diffDays} days ago`;
+            } catch {
+                return 'Recent';
+            }
         }
 
         // Main search function
@@ -784,9 +800,11 @@
 
                 updatePlayerUI(playerData, battleLog);
                 clearError();
+                apiInfo.style.display = 'none'; // Hide info message after successful load
 
             } catch (error) {
                 showError(error.message);
+                showInitialState(); // Reset to initial state on error
             }
         }
 
@@ -799,8 +817,9 @@
             }
         });
 
-        // Initialize with empty state
-        console.log('Clash Royale Analytics Tracker initialized');
+        // Initialize
+        showInitialState();
+        console.log('Clash Royale Analytics Tracker initialized with CORS proxy');
     </script>
 </body>
 </html>
