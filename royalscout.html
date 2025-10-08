@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Clash Royale Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 123, 0, 0.1);
+            border-radius: 10px;
+        }
+        
+        h1 {
+            color: #ff7b00;
+            margin-bottom: 10px;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        input {
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            width: 300px;
+            font-size: 16px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: #ff7b00;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background: #ff9500;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+        }
+        
+        .player-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff7b00;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #ccc;
+        }
+        
+        .deck-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .deck-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .card img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+        
+        .battles-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .battle {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .win {
+            border-left: 4px solid #28a745;
+        }
+        
+        .loss {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .error {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Clash Royale Analytics Tracker</h1>
+            <p>Enter your player tag to view stats and analytics</p>
+            
+            <div class="search-box">
+                <input type="text" id="playerTag" placeholder="Enter Player Tag (e.g. #ABC123)" value="#P0LY0U8G">
+                <button id="searchBtn">Search Player</button>
+            </div>
+        </header>
+
+        <div id="loading" class="loading hidden">
+            <p>Loading player data...</p>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+
+        <div id="playerData" class="hidden">
+            <div class="player-info">
+                <h2 id="playerName">Player Name</h2>
+                <p id="playerTagDisplay">Tag: #P0LY0U8G</p>
+                <p id="playerClan">Clan: Loading...</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="trophies">0</div>
+                    <div class="stat-label">Trophies</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="level">0</div>
+                    <div class="stat-label">King Level</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="wins">0</div>
+                    <div class="stat-label">Total Wins</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="losses">0</div>
+                    <div class="stat-label">Total Losses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="winRate">0%</div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="bestTrophies">0</div>
+                    <div class="stat-label">Best Trophies</div>
+                </div>
+            </div>
+
+            <div class="deck-section">
+                <h3>Current Deck</h3>
+                <div class="deck-cards" id="deckContainer">
+                    <!-- Cards will be loaded here -->
+                </div>
+            </div>
+
+            <div class="battles-section">
+                <h3>Recent Battles</h3>
+                <div id="battleList">
+                    <!-- Battles will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'https://api.clashroyale.com/v1';
+        const API_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImY3Y2QxYzM5LTQ5Y2MtNDQzZC1hYjQxLTA2YzQ1Y2QwM2QwZCIsImlhdCI6MTczMjc3NDUwNiwic3ViIjoiZGV2ZWxvcGVyL2Y3Y2QxYzM5LTQ5Y2MtNDQzZC1hYjQxLTA2YzQ1Y2QwM2QwZCIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyIxODQuMTUwLjE2OC4xNjgiXSwidHlwZSI6ImNsaWVudCJ9XX0.7hXG2C3X0t3n9hN9h2x8_6Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q5Z5n5Q';
+
+        // DOM Elements
+        const playerTagInput = document.getElementById('playerTag');
+        const searchBtn = document.getElementById('searchBtn');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const playerDataDiv = document.getElementById('playerData');
+
+        // Show/hide functions
+        function showLoading() {
+            loadingDiv.classList.remove('hidden');
+            playerDataDiv.classList.add('hidden');
+            errorDiv.classList.add('hidden');
+        }
+
+        function hideLoading() {
+            loadingDiv.classList.add('hidden');
+        }
+
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            playerDataDiv.classList.add('hidden');
+        }
+
+        function showPlayerData() {
+            playerDataDiv.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+        }
+
+        // API Functions
+        async function fetchPlayerData(playerTag) {
+            try {
+                const cleanTag = playerTag.replace('#', '').toUpperCase();
+                const encodedTag = encodeURIComponent(cleanTag);
+                
+                console.log('Fetching data for tag:', cleanTag);
+                
+                const response = await fetch(`${API_BASE_URL}/players/${encodedTag}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${API_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Player not found. Please check the player tag.');
+                    } else if (response.status === 403) {
+                        throw new Error('API access denied. Please check your API token.');
+                    } else {
+                        throw new Error(`API Error: ${response.status}`);
+                    }
+                }
+
+                return await response.json();
+                
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        async function fetchBattleLog(playerTag) {
+            try {
+                const cleanTag = playerTag.replace('#', '').toUpperCase();
+                const encodedTag = encodeURIComponent(cleanTag);
+                
+                const response = await fetch(`${API_BASE_URL}/players/${encodedTag}/battlelog`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${API_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Battle log error: ${response.status}`);
+                }
+
+                return await response.json();
+                
+            } catch (error) {
+                console.error('Battle log error:', error);
+                // Return empty array if battle log fails
+                return [];
+            }
+        }
+
+        // Data Processing Functions
+        function processPlayerData(apiData, battleLog) {
+            const wins = apiData.wins || 0;
+            const losses = apiData.losses || 0;
+            const totalGames = wins + losses;
+            const winRate = totalGames > 0 ? ((wins / totalGames) * 100).toFixed(1) : 0;
+
+            return {
+                name: apiData.name,
+                tag: `#${apiData.tag}`,
+                trophies: apiData.trophies,
+                level: apiData.expLevel,
+                wins: wins,
+                losses: losses,
+                winRate: winRate,
+                bestTrophies: apiData.bestTrophies,
+                clan: apiData.clan ? apiData.clan.name : 'No Clan',
+                deck: apiData.currentDeck || [],
+                battles: processBattleLog(battleLog)
+            };
+        }
+
+        function processBattleLog(battleLog) {
+            if (!Array.isArray(battleLog)) return [];
+            
+            return battleLog.slice(0, 5).map(battle => {
+                const teamCrowns = battle.team && battle.team[0] ? battle.team[0].crowns : 0;
+                const opponentCrowns = battle.opponent && battle.opponent[0] ? battle.opponent[0].crowns : 0;
+                const isWin = teamCrowns > opponentCrowns;
+                
+                return {
+                    result: isWin ? 'win' : 'loss',
+                    mode: battle.gameMode?.name || 'Unknown',
+                    teamCrowns: teamCrowns,
+                    opponentCrowns: opponentCrowns,
+                    timestamp: formatBattleTime(battle.battleTime)
+                };
+            });
+        }
+
+        function formatBattleTime(battleTime) {
+            try {
+                const date = new Date(battleTime);
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            } catch {
+                return 'Unknown time';
+            }
+        }
+
+        // UI Update Functions
+        function updatePlayerUI(playerData) {
+            // Basic info
+            document.getElementById('playerName').textContent = playerData.name;
+            document.getElementById('playerTagDisplay').textContent = `Tag: ${playerData.tag}`;
+            document.getElementById('playerClan').textContent = `Clan: ${playerData.clan}`;
+            
+            // Stats
+            document.getElementById('trophies').textContent = playerData.trophies;
+            document.getElementById('level').textContent = playerData.level;
+            document.getElementById('wins').textContent = playerData.wins;
+            document.getElementById('losses').textContent = playerData.losses;
+            document.getElementById('winRate').textContent = `${playerData.winRate}%`;
+            document.getElementById('bestTrophies').textContent = playerData.bestTrophies;
+            
+            // Deck
+            updateDeckUI(playerData.deck);
+            
+            // Battles
+            updateBattlesUI(playerData.battles);
+            
+            showPlayerData();
+        }
+
+        function updateDeckUI(deck) {
+            const deckContainer = document.getElementById('deckContainer');
+            deckContainer.innerHTML = '';
+
+            if (deck.length === 0) {
+                deckContainer.innerHTML = '<p>No deck data available</p>';
+                return;
+            }
+
+            deck.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card';
+                cardEl.innerHTML = `
+                    <img src="${card.iconUrls?.medium || 'https://via.placeholder.com/80'}" alt="${card.name}" onerror="this.src='https://via.placeholder.com/80'">
+                    <div class="card-name">${card.name}</div>
+                    <div class="card-level">Level ${card.level}</div>
+                `;
+                deckContainer.appendChild(cardEl);
+            });
+        }
+
+        function updateBattlesUI(battles) {
+            const battleList = document.getElementById('battleList');
+            battleList.innerHTML = '';
+
+            if (battles.length === 0) {
+                battleList.innerHTML = '<p>No recent battles found</p>';
+                return;
+            }
+
+            battles.forEach(battle => {
+                const battleEl = document.createElement('div');
+                battleEl.className = `battle ${battle.result}`;
+                battleEl.innerHTML = `
+                    <div>
+                        <strong>${battle.mode}</strong>
+                        <div>${battle.timestamp}</div>
+                    </div>
+                    <div>
+                        <strong>${battle.teamCrowns} - ${battle.opponentCrowns}</strong>
+                        <div style="color: ${battle.result === 'win' ? '#28a745' : '#dc3545'}">
+                            ${battle.result.toUpperCase()}
+                        </div>
+                    </div>
+                `;
+                battleList.appendChild(battleEl);
+            });
+        }
+
+        // Main Search Function
+        async function searchPlayer() {
+            const playerTag = playerTagInput.value.trim();
+            
+            if (!playerTag) {
+                showError('Please enter a player tag');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const [playerData, battleLog] = await Promise.all([
+                    fetchPlayerData(playerTag),
+                    fetchBattleLog(playerTag)
+                ]);
+                
+                const processedData = processPlayerData(playerData, battleLog);
+                updatePlayerUI(processedData);
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                showError(error.message || 'Failed to fetch player data. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Event Listeners
+        searchBtn.addEventListener('click', searchPlayer);
+
+        playerTagInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchPlayer();
+            }
+        });
+
+        // Initialize with sample data or instructions
+        console.log('Clash Royale Tracker Ready!');
+        console.log('API Token:', API_TOKEN ? 'Loaded' : 'Missing');
+    </script>
+</body>
+</html>
