@@ -3,351 +3,604 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Clash Royale Tracker</title>
+    <title>Clash Royale Analytics Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
+        :root {
+            --primary: #ff7b00;
+            --secondary: #1a1a2e;
+            --accent: #ffbb00;
+            --light: #f8f9fa;
+            --dark: #16213e;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+        }
+
         body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: white;
+            background: linear-gradient(135deg, var(--secondary), var(--dark));
+            color: var(--light);
             min-height: 100vh;
-            padding: 20px;
+            padding-bottom: 2rem;
         }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        
+
         header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(255, 123, 0, 0.1);
-            border-radius: 10px;
-        }
-        
-        h1 {
-            color: #ff7b00;
-            margin-bottom: 10px;
-        }
-        
-        .search-box {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 1rem 2rem;
             display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin: 20px 0;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        
-        input {
-            padding: 12px;
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-container input {
+            padding: 0.7rem 1rem;
             border: none;
-            border-radius: 5px;
+            border-radius: 50px;
             width: 300px;
-            font-size: 16px;
-        }
-        
-        button {
-            padding: 12px 24px;
-            background: #ff7b00;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        
-        button:hover {
-            background: #ff9500;
-        }
-        
-        button:disabled {
-            background: #666;
-            cursor: not-allowed;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            font-size: 18px;
-        }
-        
-        .player-info {
             background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            color: white;
+            font-size: 1rem;
         }
-        
+
+        .search-container input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-container button {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-container button:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        .player-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .player-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .player-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .player-info p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
-        
+
         .stat-card {
             background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 8px;
+            border-radius: 10px;
+            padding: 1rem;
             text-align: center;
         }
-        
+
         .stat-value {
-            font-size: 24px;
+            font-size: 1.8rem;
             font-weight: bold;
-            color: #ff7b00;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
         }
-        
+
         .stat-label {
-            font-size: 14px;
-            color: #ccc;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
         }
-        
+
         .deck-section {
             background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
         }
-        
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
         .deck-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
         }
-        
+
         .card {
             background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .card-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-            color: #ffbb00;
-        }
-        
-        .battles-section {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
             border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.3s ease;
         }
-        
-        .battle {
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .card-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-level {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .analytics-section {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            margin-top: 2rem;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .chart {
             background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-placeholder {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .chart-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .recent-battles {
+            margin-top: 2rem;
+        }
+
+        .battle-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .battle-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
-        .win {
-            border-left: 4px solid #28a745;
+
+        .battle-result {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
-        
-        .loss {
-            border-left: 4px solid #dc3545;
+
+        .battle-result.win .result-badge {
+            background: var(--success);
         }
-        
-        .error {
+
+        .battle-result.loss .result-badge {
+            background: var(--danger);
+        }
+
+        .result-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .battle-info {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .battle-mode, .battle-trophies {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .battle-mode i, .battle-trophies i {
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+            color: var(--primary);
+        }
+
+        .battle-mode span, .battle-trophies span {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2rem;
+        }
+
+        .loading i {
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
+
+        .error-message {
             background: rgba(220, 53, 69, 0.2);
             color: #ff6b6b;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 1rem;
+            border-radius: 10px;
             text-align: center;
-            margin: 20px 0;
+            margin: 1rem 0;
+            border: 1px solid rgba(220, 53, 69, 0.5);
         }
-        
-        .success {
-            background: rgba(40, 167, 69, 0.2);
-            color: #6bff8d;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            margin: 20px 0;
+
+        @media (max-width: 992px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .deck-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
         }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .api-status {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #ccc;
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .search-container input {
+                width: 200px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Clash Royale Analytics Tracker</h1>
-            <p>Enter your player tag to view stats and analytics</p>
-            
-            <div class="search-box">
-                <input type="text" id="playerTag" placeholder="Enter Player Tag (e.g. #U8028CG2V)" value="#U8028CG2V">
-                <button id="searchBtn">Search Player</button>
-            </div>
-            <div class="api-status" id="apiStatus">Using demo data - API access required for real data</div>
-        </header>
-
-        <div id="loading" class="loading hidden">
-            <p>Loading player data...</p>
+    <header>
+        <div class="logo">
+            <i class="fas fa-crown"></i>
+            <h1>Clash Royale Analytics</h1>
         </div>
+        <div class="search-container">
+            <input type="text" id="playerTag" placeholder="Enter Player Tag (e.g. #U8028CG2V)" value="#U8028CG2V">
+            <button id="searchBtn">Search</button>
+        </div>
+    </header>
 
-        <div id="error" class="error hidden"></div>
-        <div id="success" class="success hidden"></div>
-
-        <div id="playerData" class="hidden">
-            <div class="player-info">
-                <h2 id="playerName">Player Name</h2>
-                <p id="playerTagDisplay">Tag: #U8028CG2V</p>
-                <p id="playerClan">Clan: Loading...</p>
-                <p id="dataSource" style="color: #ff7b00; font-size: 14px; margin-top: 10px;"></p>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="trophies">0</div>
-                    <div class="stat-label">Trophies</div>
+    <div class="container">
+        <div id="errorContainer"></div>
+        
+        <div class="dashboard" id="dashboard">
+            <div class="player-card">
+                <div class="player-header">
+                    <div class="player-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="player-info">
+                        <h2 id="playerName">Player Name</h2>
+                        <p id="playerTagDisplay">Tag: #U8028CG2V</p>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="level">0</div>
-                    <div class="stat-label">King Level</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="wins">0</div>
-                    <div class="stat-label">Total Wins</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="losses">0</div>
-                    <div class="stat-label">Total Losses</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="winRate">0%</div>
-                    <div class="stat-label">Win Rate</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="bestTrophies">0</div>
-                    <div class="stat-label">Best Trophies</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="trophies">0</div>
+                        <div class="stat-label">Trophies</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="level">0</div>
+                        <div class="stat-label">King Level</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="wins">0</div>
+                        <div class="stat-label">Total Wins</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="losses">0</div>
+                        <div class="stat-label">Total Losses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="winRate">0%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="bestTrophies">0</div>
+                        <div class="stat-label">Best Trophies</div>
+                    </div>
                 </div>
             </div>
 
             <div class="deck-section">
-                <h3>Current Deck</h3>
+                <h2 class="section-title"><i class="fas fa-layer-group"></i> Current Deck</h2>
                 <div class="deck-cards" id="deckContainer">
-                    <!-- Cards will be loaded here -->
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="card-name">Card Name</div>
+                        <div class="card-level">Level 0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="card-name">Card Name</div>
+                        <div class="card-level">Level 0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="card-name">Card Name</div>
+                        <div class="card-level">Level 0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="card-name">Card Name</div>
+                        <div class="card-level">Level 0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="card-name">Card Name</div>
+                        <div class="card-level">Level 0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="card-name">Card Name</div>
+                        <div class="card-level">Level 0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="card-name">Card Name</div>
+                        <div class="card-level">Level 0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="card-name">Card Name</div>
+                        <div class="card-level">Level 0</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="battles-section">
-                <h3>Recent Battles</h3>
-                <div id="battleList">
-                    <!-- Battles will be loaded here -->
+            <div class="analytics-section">
+                <h2 class="section-title"><i class="fas fa-chart-line"></i> Analytics</h2>
+                <div class="charts-container">
+                    <div class="chart">
+                        <div class="chart-placeholder">
+                            <i class="fas fa-trophy"></i>
+                            <h3>Trophy Progress</h3>
+                            <p>Chart showing trophy progression over time</p>
+                        </div>
+                    </div>
+                    <div class="chart">
+                        <div class="chart-placeholder">
+                            <i class="fas fa-chart-pie"></i>
+                            <h3>Deck Win Rate</h3>
+                            <p>Win rate analysis for current deck</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-battles">
+                    <h2 class="section-title"><i class="fas fa-history"></i> Recent Battles</h2>
+                    <div class="battle-list" id="battleList">
+                        <div class="battle-card">
+                            <div class="battle-result">
+                                <div class="result-badge">WIN</div>
+                                <div>Just now</div>
+                            </div>
+                            <div class="battle-info">
+                                <div class="battle-mode">
+                                    <i class="fas fa-gamepad"></i>
+                                    <span>Ladder</span>
+                                </div>
+                                <div class="battle-trophies">
+                                    <i class="fas fa-trophy"></i>
+                                    <span>+32</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <footer>
+        <p>Clash Royale Analytics Tracker &copy; 2023 | This is a fan-made site and is not affiliated with Supercell.</p>
+        <p>Data provided by the Clash Royale API</p>
+    </footer>
+
     <script>
         // API Configuration
         const API_BASE_URL = 'https://api.clashroyale.com/v1';
-        
-        // Your API token (replace with actual token from https://developer.clashroyale.com)
-        const API_TOKEN = 'rncyr978';
-        
-        // Sample data for demonstration
-        const SAMPLE_PLAYER_DATA = {
-            name: "ClashMaster",
-            tag: "#U8028CG2V",
-            trophies: 5432,
-            level: 13,
-            wins: 1247,
-            losses: 892,
-            bestTrophies: 5678,
-            clan: "Royale Warriors",
-            deck: [
-                { name: "Knight", level: 12, elixir: 3 },
-                { name: "Archers", level: 13, elixir: 3 },
-                { name: "Fireball", level: 11, elixir: 4 },
-                { name: "Mega Minion", level: 12, elixir: 3 },
-                { name: "Battle Ram", level: 12, elixir: 4 },
-                { name: "Poison", level: 10, elixir: 4 },
-                { name: "Electro Wizard", level: 11, elixir: 4 },
-                { name: "P.E.K.K.A", level: 9, elixir: 7 }
-            ],
-            battles: [
-                { result: "win", mode: "Ladder", teamCrowns: 3, opponentCrowns: 1, timestamp: "2 hours ago" },
-                { result: "loss", mode: "2v2", teamCrowns: 0, opponentCrowns: 2, timestamp: "5 hours ago" },
-                { result: "win", mode: "Challenge", teamCrowns: 2, opponentCrowns: 0, timestamp: "1 day ago" },
-                { result: "win", mode: "Ladder", teamCrowns: 1, opponentCrowns: 0, timestamp: "1 day ago" },
-                { result: "loss", mode: "Ladder", teamCrowns: 1, opponentCrowns: 3, timestamp: "2 days ago" }
-            ]
-        };
+        const API_TOKEN = 'rncyr978'; // Your API token
 
         // DOM Elements
         const playerTagInput = document.getElementById('playerTag');
         const searchBtn = document.getElementById('searchBtn');
-        const loadingDiv = document.getElementById('loading');
-        const errorDiv = document.getElementById('error');
-        const successDiv = document.getElementById('success');
-        const playerDataDiv = document.getElementById('playerData');
-        const apiStatusDiv = document.getElementById('apiStatus');
-        const dataSourceDiv = document.getElementById('dataSource');
+        const errorContainer = document.getElementById('errorContainer');
+        const dashboard = document.getElementById('dashboard');
 
-        // Show/hide functions
+        // Show loading state
         function showLoading() {
-            loadingDiv.classList.remove('hidden');
-            playerDataDiv.classList.add('hidden');
-            errorDiv.classList.add('hidden');
-            successDiv.classList.add('hidden');
-            searchBtn.disabled = true;
+            dashboard.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Loading player data...
+                </div>
+            `;
         }
 
-        function hideLoading() {
-            loadingDiv.classList.add('hidden');
-            searchBtn.disabled = false;
-        }
-
+        // Show error message
         function showError(message) {
-            errorDiv.textContent = message;
-            errorDiv.classList.remove('hidden');
-            playerDataDiv.classList.add('hidden');
-            successDiv.classList.add('hidden');
+            errorContainer.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ${message}
+                </div>
+            `;
         }
 
-        function showSuccess(message) {
-            successDiv.textContent = message;
-            successDiv.classList.remove('hidden');
-            errorDiv.classList.add('hidden');
+        // Clear error message
+        function clearError() {
+            errorContainer.innerHTML = '';
         }
 
-        function showPlayerData(source = "demo") {
-            playerDataDiv.classList.remove('hidden');
-            errorDiv.classList.add('hidden');
-            dataSourceDiv.textContent = `Data source: ${source}`;
-        }
-
-        // Real API Functions
-        async function fetchRealPlayerData(playerTag) {
+        // Fetch player data from Clash Royale API
+        async function fetchPlayerData(playerTag) {
             try {
+                clearError();
+                showLoading();
+
+                // Remove # and encode for URL
                 const cleanTag = playerTag.replace('#', '').toUpperCase();
                 const encodedTag = encodeURIComponent(cleanTag);
                 
-                console.log('Fetching real API data for tag:', cleanTag);
-                
+                console.log('Fetching data for player tag:', cleanTag);
+
                 const response = await fetch(`${API_BASE_URL}/players/${encodedTag}`, {
                     method: 'GET',
                     headers: {
@@ -357,23 +610,32 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API returned ${response.status}: ${response.statusText}`);
+                    if (response.status === 404) {
+                        throw new Error('Player not found. Please check the player tag.');
+                    } else if (response.status === 403) {
+                        throw new Error('Invalid API token. Please check your API configuration.');
+                    } else if (response.status === 429) {
+                        throw new Error('Rate limit exceeded. Please try again later.');
+                    } else {
+                        throw new Error(`API error: ${response.status} ${response.statusText}`);
+                    }
                 }
 
-                const data = await response.json();
-                return data;
-                
+                const playerData = await response.json();
+                return playerData;
+
             } catch (error) {
-                console.error('Real API Error:', error);
+                console.error('Error fetching player data:', error);
                 throw error;
             }
         }
 
-        async function fetchRealBattleLog(playerTag) {
+        // Fetch battle log
+        async function fetchBattleLog(playerTag) {
             try {
                 const cleanTag = playerTag.replace('#', '').toUpperCase();
                 const encodedTag = encodeURIComponent(cleanTag);
-                
+
                 const response = await fetch(`${API_BASE_URL}/players/${encodedTag}/battlelog`, {
                     method: 'GET',
                     headers: {
@@ -387,134 +649,120 @@
                 }
 
                 return await response.json();
-                
+
             } catch (error) {
-                console.error('Battle log error:', error);
+                console.error('Error fetching battle log:', error);
                 return [];
             }
         }
 
-        // Demo Data Functions
-        function getDemoPlayerData(playerTag) {
-            // Create variation based on player tag for demo purposes
-            const demoData = {...SAMPLE_PLAYER_DATA};
-            demoData.tag = playerTag;
-            
-            // Add some random variation to make it look different
-            const hash = playerTag.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
-            demoData.trophies = 5000 + (hash % 2000);
-            demoData.wins = 1000 + (hash % 500);
-            demoData.losses = 800 + (hash % 400);
-            demoData.bestTrophies = demoData.trophies + 200 + (hash % 100);
-            demoData.level = 11 + (hash % 4);
-            
-            return demoData;
-        }
-
-        // Data Processing
-        function processPlayerData(apiData, battleLog, source) {
-            const wins = apiData.wins || 0;
-            const losses = apiData.losses || 0;
+        // Update UI with player data
+        function updatePlayerUI(playerData, battleLog) {
+            // Calculate win rate
+            const wins = playerData.wins || 0;
+            const losses = playerData.losses || 0;
             const totalGames = wins + losses;
             const winRate = totalGames > 0 ? ((wins / totalGames) * 100).toFixed(1) : 0;
 
-            return {
-                name: apiData.name,
-                tag: apiData.tag,
-                trophies: apiData.trophies,
-                level: apiData.expLevel || apiData.level,
-                wins: wins,
-                losses: losses,
-                winRate: winRate,
-                bestTrophies: apiData.bestTrophies,
-                clan: apiData.clan ? (apiData.clan.name || apiData.clan) : 'No Clan',
-                deck: apiData.currentDeck || apiData.deck || [],
-                battles: battleLog || apiData.battles || [],
-                source: source
-            };
-        }
-
-        // UI Update Functions
-        function updatePlayerUI(playerData) {
-            // Basic info
+            // Update basic info
             document.getElementById('playerName').textContent = playerData.name;
-            document.getElementById('playerTagDisplay').textContent = `Tag: ${playerData.tag}`;
-            document.getElementById('playerClan').textContent = `Clan: ${playerData.clan}`;
+            document.getElementById('playerTagDisplay').textContent = `Tag: #${playerData.tag}`;
             
-            // Stats
+            // Update stats
             document.getElementById('trophies').textContent = playerData.trophies;
-            document.getElementById('level').textContent = playerData.level;
-            document.getElementById('wins').textContent = playerData.wins;
-            document.getElementById('losses').textContent = playerData.losses;
-            document.getElementById('winRate').textContent = `${playerData.winRate}%`;
+            document.getElementById('level').textContent = playerData.expLevel;
+            document.getElementById('wins').textContent = wins;
+            document.getElementById('losses').textContent = losses;
+            document.getElementById('winRate').textContent = `${winRate}%`;
             document.getElementById('bestTrophies').textContent = playerData.bestTrophies;
-            
-            // Deck
-            updateDeckUI(playerData.deck);
-            
-            // Battles
-            updateBattlesUI(playerData.battles);
-            
-            showPlayerData(playerData.source);
-            
-            if (playerData.source === "real") {
-                showSuccess("Successfully loaded real player data from Clash Royale API!");
-            } else {
-                showSuccess("Showing demo data. To see real data, please set up a valid API token.");
-            }
+
+            // Update deck
+            updateDeckUI(playerData.currentDeck);
+
+            // Update battles
+            updateBattlesUI(battleLog);
         }
 
+        // Update deck UI
         function updateDeckUI(deck) {
             const deckContainer = document.getElementById('deckContainer');
             deckContainer.innerHTML = '';
 
-            if (deck.length === 0) {
-                deckContainer.innerHTML = '<p>No deck data available</p>';
+            if (!deck || deck.length === 0) {
+                deckContainer.innerHTML = '<div class="card"><div class="card-name">No deck data</div></div>';
                 return;
             }
 
             deck.forEach(card => {
-                const cardEl = document.createElement('div');
-                cardEl.className = 'card';
-                cardEl.innerHTML = `
-                    <div class="card-icon">⚔️</div>
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.innerHTML = `
+                    <div class="card-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
                     <div class="card-name">${card.name}</div>
                     <div class="card-level">Level ${card.level}</div>
-                    <div class="card-elixir">${card.elixir} Elixir</div>
                 `;
-                deckContainer.appendChild(cardEl);
+                deckContainer.appendChild(cardElement);
             });
         }
 
-        function updateBattlesUI(battles) {
+        // Update battles UI
+        function updateBattlesUI(battleLog) {
             const battleList = document.getElementById('battleList');
             battleList.innerHTML = '';
 
-            if (battles.length === 0) {
-                battleList.innerHTML = '<p>No recent battles found</p>';
+            if (!battleLog || battleLog.length === 0) {
+                battleList.innerHTML = '<div class="battle-card"><div>No recent battles</div></div>';
                 return;
             }
 
-            battles.forEach(battle => {
-                const battleEl = document.createElement('div');
-                battleEl.className = `battle ${battle.result}`;
-                battleEl.innerHTML = `
-                    <div>
-                        <strong>${battle.mode}</strong>
-                        <div>${battle.timestamp}</div>
+            // Show last 5 battles
+            const recentBattles = battleLog.slice(0, 5);
+
+            recentBattles.forEach(battle => {
+                const teamCrowns = battle.team[0]?.crowns || 0;
+                const opponentCrowns = battle.opponent[0]?.crowns || 0;
+                const isWin = teamCrowns > opponentCrowns;
+                const gameMode = battle.gameMode?.name || 'Unknown';
+
+                const battleElement = document.createElement('div');
+                battleElement.className = 'battle-card';
+                battleElement.innerHTML = `
+                    <div class="battle-result ${isWin ? 'win' : 'loss'}">
+                        <div class="result-badge">${isWin ? 'WIN' : 'LOSS'}</div>
+                        <div>${formatBattleTime(battle.battleTime)}</div>
                     </div>
-                    <div>
-                        <strong>${battle.teamCrowns} - ${battle.opponentCrowns}</strong>
-                        <div style="color: ${battle.result === 'win' ? '#28a745' : '#dc3545'}">
-                            ${battle.result.toUpperCase()}
+                    <div class="battle-info">
+                        <div class="battle-mode">
+                            <i class="fas fa-gamepad"></i>
+                            <span>${gameMode}</span>
+                        </div>
+                        <div class="battle-trophies">
+                            <i class="fas fa-crown"></i>
+                            <span>${teamCrowns}-${opponentCrowns}</span>
                         </div>
                     </div>
                 `;
-                battleList.appendChild(battleEl);
+                battleList.appendChild(battleElement);
             });
         }
 
-        // Main Search Function
+        // Format battle time
+        function formatBattleTime(battleTime) {
+            const date = new Date(battleTime);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffHours < 1) return 'Just now';
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays === 1) return '1 day ago';
+            return `${diffDays} days ago`;
+        }
+
+        // Main search function
         async function searchPlayer() {
             const playerTag = playerTagInput.value.trim();
             
@@ -523,47 +771,26 @@
                 return;
             }
 
-            // Validate player tag format
             if (!playerTag.startsWith('#')) {
                 showError('Player tag must start with #');
                 return;
             }
 
-            showLoading();
-
             try {
-                let playerData, battleLog, source;
-                
-                // Try real API first
-                try {
-                    console.log('Attempting to fetch from real API...');
-                    playerData = await fetchRealPlayerData(playerTag);
-                    battleLog = await fetchRealBattleLog(playerTag);
-                    source = "real";
-                    apiStatusDiv.textContent = "Connected to Clash Royale API";
-                    apiStatusDiv.style.color = "#28a745";
-                } catch (apiError) {
-                    console.log('Real API failed, using demo data:', apiError.message);
-                    // Fall back to demo data
-                    playerData = getDemoPlayerData(playerTag);
-                    battleLog = [];
-                    source = "demo";
-                    apiStatusDiv.textContent = "Using demo data - API unavailable";
-                    apiStatusDiv.style.color = "#ff7b00";
-                }
-                
-                const processedData = processPlayerData(playerData, battleLog, source);
-                updatePlayerUI(processedData);
-                
+                const [playerData, battleLog] = await Promise.all([
+                    fetchPlayerData(playerTag),
+                    fetchBattleLog(playerTag)
+                ]);
+
+                updatePlayerUI(playerData, battleLog);
+                clearError();
+
             } catch (error) {
-                console.error('Search error:', error);
-                showError('Failed to load player data: ' + error.message);
-            } finally {
-                hideLoading();
+                showError(error.message);
             }
         }
 
-        // Event Listeners
+        // Event listeners
         searchBtn.addEventListener('click', searchPlayer);
 
         playerTagInput.addEventListener('keypress', (e) => {
@@ -572,15 +799,8 @@
             }
         });
 
-        // Initialize
-        console.log('Clash Royale Tracker Ready!');
-        console.log('Player tag to try: #U8028CG2V');
-        
-        // Auto-load demo data on startup
-        setTimeout(() => {
-            const demoData = getDemoPlayerData("#U8028CG2V");
-            updatePlayerUI(processPlayerData(demoData, demoData.battles, "demo"));
-        }, 500);
+        // Initialize with empty state
+        console.log('Clash Royale Analytics Tracker initialized');
     </script>
 </body>
 </html>
