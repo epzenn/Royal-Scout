@@ -357,14 +357,14 @@
             border: 1px solid rgba(220, 53, 69, 0.5);
         }
 
-        .api-info {
-            background: rgba(255, 193, 7, 0.2);
-            color: #ffd351;
+        .success-message {
+            background: rgba(40, 167, 69, 0.2);
+            color: #6bff8d;
             padding: 1rem;
             border-radius: 10px;
             text-align: center;
             margin: 1rem 0;
-            border: 1px solid rgba(255, 193, 7, 0.5);
+            border: 1px solid rgba(40, 167, 69, 0.5);
         }
 
         @media (max-width: 992px) {
@@ -412,13 +412,10 @@
 
     <div class="container">
         <div id="errorContainer"></div>
-        <div id="apiInfo" class="api-info">
-            <i class="fas fa-info-circle"></i>
-            Using proxy to bypass CORS restrictions. This may be slower but should work.
-        </div>
+        <div id="successContainer"></div>
         
         <div class="dashboard" id="dashboard">
-            <!-- Dashboard content will be loaded here -->
+            <!-- Content will be loaded here -->
         </div>
     </div>
 
@@ -428,19 +425,18 @@
     </footer>
 
     <script>
-        // API Configuration with CORS proxy
+        // API Configuration with your real token
         const API_BASE_URL = 'https://api.clashroyale.com/v1';
-        const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/'; // Public CORS proxy
-        const API_TOKEN = 'rncyr978';
+        const API_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjgxYTg0ODU1LWYwZWMtNGJhOC05N2Q5LWMwZGE5NWMzMDg0OCIsImlhdCI6MTc1OTk0NjIzNSwic3ViIjoiZGV2ZWxvcGVyLzBmZmI5NjRkLTRiZmItYTZkZi1hZDRhLTk4Njc5Mjk5YzNlNiIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI2Ni4yNDQuMjM0LjI1NCJdLCJ0eXBlIjoiY2xpZW50In1dfQ.Io8vuL-IQ2FsOPKISWb0AfXZuT811yNG3_TN6gMs1vPQ6NhAyWG_1UU9ptIJxwYlXQvPtWokalPIsp2tk2D8Dg';
 
         // DOM Elements
         const playerTagInput = document.getElementById('playerTag');
         const searchBtn = document.getElementById('searchBtn');
         const errorContainer = document.getElementById('errorContainer');
-        const apiInfo = document.getElementById('apiInfo');
+        const successContainer = document.getElementById('successContainer');
         const dashboard = document.getElementById('dashboard');
 
-        // Show initial dashboard state
+        // Show initial state
         function showInitialState() {
             dashboard.innerHTML = `
                 <div class="player-card">
@@ -534,7 +530,7 @@
             dashboard.innerHTML = `
                 <div class="loading">
                     <i class="fas fa-spinner fa-spin"></i>
-                    Loading player data...
+                    Loading player data from Clash Royale API...
                 </div>
             `;
         }
@@ -547,17 +543,30 @@
                     ${message}
                 </div>
             `;
+            successContainer.innerHTML = '';
         }
 
-        // Clear error message
-        function clearError() {
+        // Show success message
+        function showSuccess(message) {
+            successContainer.innerHTML = `
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    ${message}
+                </div>
+            `;
             errorContainer.innerHTML = '';
         }
 
-        // Fetch player data using proxy to avoid CORS
+        // Clear messages
+        function clearMessages() {
+            errorContainer.innerHTML = '';
+            successContainer.innerHTML = '';
+        }
+
+        // Fetch player data from Clash Royale API
         async function fetchPlayerData(playerTag) {
             try {
-                clearError();
+                clearMessages();
                 showLoading();
 
                 // Remove # and encode for URL
@@ -566,10 +575,7 @@
                 
                 console.log('Fetching data for player tag:', cleanTag);
 
-                // Try with CORS proxy first
-                const proxyUrl = `${CORS_PROXY}${API_BASE_URL}/players/${encodedTag}`;
-                
-                const response = await fetch(proxyUrl, {
+                const response = await fetch(`${API_BASE_URL}/players/${encodedTag}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${API_TOKEN}`,
@@ -578,40 +584,23 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    if (response.status === 404) {
+                        throw new Error('Player not found. Please check the player tag.');
+                    } else if (response.status === 403) {
+                        throw new Error('Invalid API token or access denied.');
+                    } else if (response.status === 429) {
+                        throw new Error('Rate limit exceeded. Please try again later.');
+                    } else {
+                        throw new Error(`API error: ${response.status} ${response.statusText}`);
+                    }
                 }
 
                 const playerData = await response.json();
                 return playerData;
 
             } catch (error) {
-                console.error('Error with proxy fetch:', error);
-                
-                // If proxy fails, try direct API call (might still fail due to CORS)
-                try {
-                    console.log('Trying direct API call...');
-                    const cleanTag = playerTag.replace('#', '').toUpperCase();
-                    const encodedTag = encodeURIComponent(cleanTag);
-                    
-                    const directResponse = await fetch(`${API_BASE_URL}/players/${encodedTag}`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${API_TOKEN}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if (!directResponse.ok) {
-                        throw new Error(`Direct API call failed: ${directResponse.status}`);
-                    }
-
-                    const playerData = await directResponse.json();
-                    return playerData;
-
-                } catch (directError) {
-                    console.error('Direct API call also failed:', directError);
-                    throw new Error('Cannot connect to Clash Royale API. This is usually a CORS issue. Try running this page from a local server.');
-                }
+                console.error('Error fetching player data:', error);
+                throw error;
             }
         }
 
@@ -621,10 +610,7 @@
                 const cleanTag = playerTag.replace('#', '').toUpperCase();
                 const encodedTag = encodeURIComponent(cleanTag);
 
-                // Try proxy first
-                const proxyUrl = `${CORS_PROXY}${API_BASE_URL}/players/${encodedTag}/battlelog`;
-                
-                const response = await fetch(proxyUrl, {
+                const response = await fetch(`${API_BASE_URL}/players/${encodedTag}/battlelog`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${API_TOKEN}`,
@@ -694,7 +680,7 @@
 
                 <div class="deck-section">
                     <h2 class="section-title"><i class="fas fa-layer-group"></i> Current Deck</h2>
-                    <div class="deck-cards" id="deckContainer">
+                    <div class="deck-cards">
                         ${playerData.currentDeck ? playerData.currentDeck.map(card => `
                             <div class="card">
                                 <div class="card-icon">
@@ -728,7 +714,7 @@
 
                     <div class="recent-battles">
                         <h2 class="section-title"><i class="fas fa-history"></i> Recent Battles</h2>
-                        <div class="battle-list" id="battleList">
+                        <div class="battle-list">
                             ${battleLog && battleLog.length > 0 ? battleLog.slice(0, 5).map(battle => {
                                 const teamCrowns = battle.team[0]?.crowns || 0;
                                 const opponentCrowns = battle.opponent[0]?.crowns || 0;
@@ -799,12 +785,11 @@
                 ]);
 
                 updatePlayerUI(playerData, battleLog);
-                clearError();
-                apiInfo.style.display = 'none'; // Hide info message after successful load
+                showSuccess(`Successfully loaded data for ${playerData.name}!`);
 
             } catch (error) {
                 showError(error.message);
-                showInitialState(); // Reset to initial state on error
+                showInitialState();
             }
         }
 
@@ -819,7 +804,7 @@
 
         // Initialize
         showInitialState();
-        console.log('Clash Royale Analytics Tracker initialized with CORS proxy');
+        console.log('Clash Royale Analytics Tracker initialized with real API token');
     </script>
 </body>
 </html>
